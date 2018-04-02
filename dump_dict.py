@@ -1,7 +1,10 @@
 #!coding: utf-8
+import os
+
 from pymongo import MongoClient
 
-c = MongoClient(host='192.168.33.10')
+mongo_host = os.getenv("MONGO_HOST") or 'localhost'
+c = MongoClient(host=mongo_host)
 
 dict_list = []
 for doc in c.crawler.google_trends.find({}):

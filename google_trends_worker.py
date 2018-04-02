@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 import sys
 import datetime
 import json
@@ -8,7 +9,14 @@ from pymongo import MongoClient
 import pymongo
 import requests
 
-app = Celery('tasks', broker='pyamqp://test:test@192.168.33.10//')
+mongo_host = os.getenv('MONGO_HOST') or 'localhost'
+rabbitmq_host = os.getenv('RABBITMQ_HOST') or 'localhost'
+rabbitmq_username = os.getenv('RABBITMQ_USERNAME') or 'test'
+rabbitmq_password = os.getenv('RABBITMQ_PASSWORD') or 'test'
+
+app = Celery('tasks', broker='pyamqp://%s:%s@%s//'%(rabbitmq_username,
+                                                    rabbitmq_password,
+                                                    rabbitmq_host))
 
 @app.task
 def get_google_trends(start_date, days):
@@ -17,7 +25,7 @@ def get_google_trends(start_date, days):
 
 @app.task
 def dump_json(start_date, day):
-    conn = MongoClient()
+    conn = MongoClient(host=mongo_host)
 
     dstr = (datetime.datetime.strptime(start_date,'%Y%m%d') - datetime.timedelta(days=day)).strftime("%Y%m%d")
 

@@ -49,4 +49,5 @@ for day in range(1,days + 1):
             print("[INFO] Inserted id %s"%res)
         except pymongo.errors.DuplicateKeyError as e:
             print(e)
-            print("[INFO] %s exists, skipping"%row['_id'])
+            res = conn.crawler.google_trends.update({'_id': row['_id']}, row)
+            print("[INFO] %s exists, updating"%res)
